@@ -44,6 +44,28 @@ class EnrollControllerTest {
     private CourseRepository courseRepository;
 
     @Test
+    void should_retrieve_enroll_report() throws Exception {
+        userRepository.save(user);
+        courseRepository.save(course);
+        userRepository.save(user2);
+        courseRepository.save(course2);
+
+        enrollRepository.save(new Enroll(user, course, LocalDateTime.now()));
+        enrollRepository.save(new Enroll(user, course2, LocalDateTime.now()));
+        enrollRepository.save(new Enroll(user2, course2, LocalDateTime.now()));
+
+        mockMvc.perform(get("/courses/enroll/report")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(jsonPath("$[0].email", is("rodrigo@gmail.com")))
+                .andExpect(jsonPath("$[0].quantidade_matriculas", is(2)))
+                .andExpect(jsonPath("$[1].email", is("ruan@gmail.com")))
+                .andExpect(jsonPath("$[1].quantidade_matriculas", is(1)));
+    }
+
+    @Test
     void should_add_new_enroll() throws Exception {
         userRepository.save(user);
         courseRepository.save(course);

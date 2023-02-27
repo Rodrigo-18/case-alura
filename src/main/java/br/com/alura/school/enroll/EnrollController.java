@@ -4,6 +4,7 @@ import br.com.alura.school.course.Course;
 import br.com.alura.school.course.CourseRepository;
 import br.com.alura.school.user.User;
 import br.com.alura.school.user.UserRepository;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -11,8 +12,11 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.Valid;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RestController
@@ -29,6 +33,13 @@ class EnrollController {
         this.userRepository = userRepository;
     }
 
+    @GetMapping("/courses/enroll/report")
+    ResponseEntity<List<EnrollReportResponse>> enrollReport() {
+        List<EnrollReportResponse> enrollReport = enrollRepository.getEnrollReport().stream().
+                map(enroll -> new EnrollReportResponse(enroll)).collect(Collectors.toList());
+        if(enrollReport.isEmpty()) throw new ResponseStatusException(NO_CONTENT, format("Does not have any enrollment records"));
+        return ResponseEntity.ok(enrollReport);
+    }
 
     @PostMapping("/courses/{courseCode}/enroll")
     ResponseEntity<Void> newEnroll(@RequestBody @Valid NewEnrollRequest newEnrollRequest, @PathVariable("courseCode") String courseCode) {

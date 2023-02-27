@@ -10,9 +10,9 @@ class EnrollReportResponse {
     @JsonProperty("quantidade_matriculas")
     private final Long quantidadeMatriculas;
 
-    EnrollReportResponse(EnrollReportDto enrollDto) {
-        this.email = enrollDto.getEmail();
-        this.quantidadeMatriculas = enrollDto.getQuantidadeMatriculas();
+    EnrollReportResponse(EnrollReportRecord enrollRecord) {
+        this.email = enrollRecord.getEmail();
+        this.quantidadeMatriculas = enrollRecord.getQuantidadeMatriculas();
     }
 
 

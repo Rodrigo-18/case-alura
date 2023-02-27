@@ -79,7 +79,7 @@ class EnrollControllerTest {
     }
 
     @Test
-    void should_not_allow_username_nonexistent() throws Exception {
+    void should_not_allow_when_user_does_not_exist() throws Exception {
         courseRepository.save(course);
 
         NewEnrollRequest newEnrollRequest = new NewEnrollRequest("rodrigo");
@@ -92,7 +92,7 @@ class EnrollControllerTest {
     }
 
     @Test
-    void should_not_allow_course_code_nonexistent() throws Exception {
+    void should_not_allow_when_course_does_not_exist() throws Exception {
         userRepository.save(user);
 
         NewEnrollRequest newEnrollRequest = new NewEnrollRequest("rodrigo");

@@ -10,8 +10,11 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -68,5 +71,57 @@ class CourseControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/courses/java-2"));
     }
+    
+    @Test
+    void should_not_allow_duplication_of_code() throws Exception {
+        
+        courseRepository.save(new Course("java-2", "Java Basics", "Java basics: OOP, Control structures and more."));
+        
+        NewCourseRequest newCourseRequest = new NewCourseRequest("java-2", "Java Collections", "Java Collections: Lists, Sets, Maps and more.");
+
+        mockMvc.perform(post("/courses")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(newCourseRequest)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    void should_not_allow_duplication_of_name() throws Exception {
+        
+        courseRepository.save(new Course("java-2", "Java Basics", "Java basics: OOP, Control structures and more."));
+        
+        NewCourseRequest newCourseRequest = new NewCourseRequest("java-3", "Java Basics", "Java basics: OOP, Control structures and more.");
+
+        mockMvc.perform(post("/courses")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(newCourseRequest)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    void not_found_when_course_does_not_exist() throws Exception {
+        mockMvc.perform(get("/courses/non-existent")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+    
+        @ParameterizedTest
+    @CsvSource({
+            "' ', Java, Basic concepts about Java",
+            "java-1, ' ', Basic concepts about Java",
+            "code-name-big, Java, Basic concepts about Java",
+            "spring-2, name-exceeding-the-limit, Basic concepts about Spring-boot"
+    })
+    void should_validate_bad_course_requests(String code, String name, String description) throws Exception {
+        NewCourseRequest newCourse = new NewCourseRequest(code, name, description);
+
+        mockMvc.perform(post("/courses")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(newCourse)))
+                .andExpect(status().isBadRequest());
+    }
+
 
 }

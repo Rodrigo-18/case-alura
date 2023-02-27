@@ -1,12 +1,12 @@
 package br.com.alura.school.enroll;
 
-public class EnrollReportDto {
+public class EnrollReportRecord {
     
     private Long quantidadeMatriculas;
 
     private String email;
 
-    public EnrollReportDto(String email, Long quantidadeMatriculas) {
+    public EnrollReportRecord(String email, Long quantidadeMatriculas) {
         this.quantidadeMatriculas = quantidadeMatriculas;
         this.email = email;
     }
